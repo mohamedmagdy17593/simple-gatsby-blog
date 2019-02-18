@@ -1,9 +1,11 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import styled from '@emotion/styled'
 
 import darkImg from '../assets/dark.jpg'
 import lightImg from '../assets/light.png'
 import {useTheme} from './layout'
+import onDrag from '../utils/onDrag'
+import useKeepTrackOf from '../utils/hooks/useKeepTrackOf'
 
 const ResizeHandler = styled.div(({theme: {color: background}}) => ({
   background,
@@ -23,35 +25,10 @@ const ImageContainer = styled.div(
   }),
 )
 
-function onDrag({down = () => {}, up = () => {}, move = () => {}}) {
-  return {
-    onMouseDown(e) {
-      down(e)
-      const mousemove = e => move(e)
-      const mouseup = e => {
-        up(e)
-        window.removeEventListener('mousemove', mousemove)
-        window.removeEventListener('mouseup', mouseup)
-      }
-      window.addEventListener('mousemove', mousemove)
-      window.addEventListener('mouseup', mouseup)
-    },
-  }
-}
-
-function useKeepTrackOf(value) {
-  const valueRef = React.useRef(value)
-  React.useEffect(() => {
-    valueRef.current = value
-  }, [value])
-  return valueRef
-}
-
 function Hero() {
   const {isDark, setIsDark} = useTheme()
-  const [flexGrow, setFlexGrow] = React.useState(+isDark)
+  const [flexGrow, setFlexGrow] = useState(+isDark)
   const flexGrowRef = useKeepTrackOf(flexGrow)
-  const [transitionTime, setTransitionTime] = React.useState(1)
 
   const moveAction = e => setFlexGrow(e.pageX / window.innerWidth)
   const upAction = () => {
@@ -60,11 +37,12 @@ function Hero() {
     setFlexGrow(+!isDark)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     setFlexGrow(+!isDark)
   }, [isDark])
 
-  React.useEffect(() => {
+  const [transitionTime, setTransitionTime] = useState(1)
+  useEffect(() => {
     setTimeout(() => {
       setTransitionTime(0.1)
     }, 1000)

@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useContext, createContext} from 'react'
 import {css, Global} from '@emotion/core'
 import {Link, StaticQuery, graphql} from 'gatsby'
 import {ThemeProvider} from 'emotion-theming'
 import Switch from 'react-switch'
 
 import {rhythm} from '../utils/typography'
+import useInjectState from '../utils/hooks/useInjectState'
 
 const theme = {
   dark: {
@@ -17,23 +18,17 @@ const theme = {
   },
 }
 
-const themeContext = React.createContext()
+const themeContext = createContext()
 
 function useTheme() {
-  return React.useContext(themeContext)
+  return useContext(themeContext)
 }
 
 function Layout({children}) {
-  const [isDark, setIsDark_] = React.useState(
-    () => window.localStorage.getItem('theme') === 'dark',
+  const [isDark, setIsDark] = useInjectState(
+    () => localStorage.getItem('theme') === 'dark',
+    v => localStorage.setItem('theme', v ? 'dark' : 'light'),
   )
-  const setIsDark = value => {
-    setIsDark_(b => {
-      const returnedValue = typeof value === 'function' ? value(b) : value
-      window.localStorage.setItem('theme', returnedValue ? 'dark' : 'light')
-      return returnedValue
-    })
-  }
   const toggle = () => setIsDark(b => !b)
   return (
     <themeContext.Provider value={{isDark, setIsDark, toggle}}>
