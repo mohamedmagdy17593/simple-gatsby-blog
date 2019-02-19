@@ -37,7 +37,7 @@ function Layout({children}) {
           styles={styles => ({
             'body, a, h1, a h1, a h3': {
               ...styles,
-              transition: '0.1s color ease',
+              transition: '0.3s color ease',
             },
           })}
         />

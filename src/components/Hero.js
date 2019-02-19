@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import styled from '@emotion/styled'
 
-import darkImg from '../assets/dark.jpg'
-import lightImg from '../assets/light.png'
 import {useTheme} from './layout'
 import onDrag from '../utils/onDrag'
 import useKeepTrackOf from '../utils/hooks/useKeepTrackOf'
+
+import darkImg from '../assets/dark.png'
+import lightImg from '../assets/light.jpg'
 
 const ResizeHandler = styled.div(({theme: {color: background}}) => ({
   background,
@@ -30,9 +31,14 @@ function Hero() {
   const [flexGrow, setFlexGrow] = useState(+isDark)
   const flexGrowRef = useKeepTrackOf(flexGrow)
 
-  const moveAction = e => setFlexGrow(e.pageX / window.innerWidth)
-  const upAction = () => {
+  const transationTime = 0.6
+  const [transitionTime, setTransitionTime] = useState(transationTime)
+
+  const down = () => setTransitionTime(0)
+  const move = e => setFlexGrow(e.pageX / window.innerWidth)
+  const up = () => {
     const isDark = flexGrowRef.current < 0.5
+    setTransitionTime(transationTime)
     setIsDark(isDark)
     setFlexGrow(+!isDark)
   }
@@ -40,13 +46,6 @@ function Hero() {
   useEffect(() => {
     setFlexGrow(+!isDark)
   }, [isDark])
-
-  const [transitionTime, setTransitionTime] = useState(1)
-  useEffect(() => {
-    setTimeout(() => {
-      setTransitionTime(0.1)
-    }, 1000)
-  }, [])
 
   return (
     <div
@@ -67,7 +66,7 @@ function Hero() {
         img={lightImg}
         transitionTime={transitionTime}
       />
-      <ResizeHandler {...onDrag({move: moveAction, up: upAction})} />
+      <ResizeHandler {...onDrag({move, up, down})} />
       <ImageContainer
         flexGrow={1 - flexGrow}
         imgPosition="right"
